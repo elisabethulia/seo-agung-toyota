@@ -13,6 +13,10 @@ export const metadata: Metadata = {
   title: "Promo Agung Toyota Terbaik - Harga Terbaru & Diskon",
   description: "Dapatkan penawaran terbaik mobil Toyota di Agung Toyota. Harga terbaru, diskon, dan spesifikasi lengkap untuk semua jenis mobil Toyota.",
   keywords: "Agung Toyota, Promo Toyota, Harga Toyota, Dealer Toyota",
+
+  verification: {
+    google: "oDzyHJHUhX",
+  },
 };
 
 export default function RootLayout({
