@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   keywords: "Agung Toyota, Promo Toyota, Harga Toyota, Dealer Toyota",
 
   verification: {
-    google: "Nneh1V8Cy",
+    google: "Nneh1V8Cy8pCCXNtWR28L2B8NFis7Yrwq3Fddyg5BlI",
   },
 };
 
