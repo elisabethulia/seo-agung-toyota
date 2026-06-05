@@ -45,6 +45,7 @@ export default async function EditPage({ params }: { params: Promise<{ id: strin
     ...car,
     warna: warnaArr,
     fitur: fiturArr,
+    harga: car.harga,
   };
 
   return <EditMobilForm initialCar={formattedCar} />;
