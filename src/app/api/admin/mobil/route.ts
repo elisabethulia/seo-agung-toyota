@@ -2,11 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 
-import { writeFile, mkdir } from "fs/promises";
-import { Buffer } from "buffer";
-import path from "path";
-import { randomUUID } from "crypto";
-
 export async function POST(req: Request) {
   try {
     const session = await getSession();
@@ -41,9 +36,9 @@ const deskripsi = formData.get("deskripsi")?.toString() || "";
     const warna = parseJSON(formData.get("warna") as string);
     const fitur = parseJSON(formData.get("fitur") as string);
 
-    const gambarFile = formData.get("gambar") as File | null;
+   const gambar = formData.get("gambar")?.toString() || "";
 
-    if (!nama || !slug || !harga || !tipe || !deskripsi) {
+    if (!nama || !slug || !harga || !tipe || !deskripsi || !gambar) {
       return NextResponse.json(
         { message: "Field wajib diisi" },
         { status: 400 }
@@ -61,26 +56,6 @@ const deskripsi = formData.get("deskripsi")?.toString() || "";
         },
         { status: 400 }
       );
-    }
-
-    let gambar = "";
-
-    if (gambarFile) {
-      const bytes = await gambarFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
-      const extension =
-        gambarFile.name.split(".").pop() || "jpg";
-
-      const filename = `${randomUUID()}.${extension}`;
-
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-      await mkdir(uploadDir, { recursive: true });
-
-      await writeFile(path.join(uploadDir, filename), buffer);
-
-      gambar = `/uploads/${filename}`;
     }
 
     const newCar = await prisma.kendaraan.create({
