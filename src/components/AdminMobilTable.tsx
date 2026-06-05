@@ -8,7 +8,7 @@ interface Car {
   id: number;
   nama: string;
   slug: string;
-  harga: string;
+  harga: number;
   tipe: string;
   gambar: string;
 }
