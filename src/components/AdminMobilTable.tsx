@@ -68,12 +68,11 @@ export default function AdminMobilTable({ initialCars }: AdminMobilTableProps) {
   };
 
   // Filter cars based on search query
-  const filteredCars = cars.filter(
-    (car) =>
-      car.nama.toLowerCase().includes(search.toLowerCase()) ||
-      car.tipe.toLowerCase().includes(search.toLowerCase()) ||
-      car.harga.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredCars = cars.filter((car) =>
+  car.nama.toLowerCase().includes(search.toLowerCase()) ||
+  car.tipe.toLowerCase().includes(search.toLowerCase()) ||
+  car.harga.toString().includes(search)
+);
 
   return (
     <div className="space-y-6">
