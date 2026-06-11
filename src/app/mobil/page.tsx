@@ -30,6 +30,23 @@ const formatRupiah = (value: string | number) => {
   }).format(Number(cleanNumberString));
 };
 
+
+const getSafeImageSrc = (src: string | null | undefined) => {
+  const fallbackImage = "/uploads/mobil-default.jpg";
+
+  if (!src) return fallbackImage;
+
+  console.log(src);
+
+  if (src === "[object File]") return fallbackImage;
+
+  if (src.includes("via.placeholder.com")) return fallbackImage;
+
+  const isValidPath = src.startsWith("/") || src.startsWith("http://") || src.startsWith("https://");
+
+  return isValidPath ? src : fallbackImage;
+};
+
 export default async function MobilList() {
   let dbCars = await prisma.kendaraan.findMany({
     orderBy: { createdAt: "desc" },
@@ -83,7 +100,7 @@ export default async function MobilList() {
             >
               <div className="relative h-56 w-full bg-zinc-200 dark:bg-zinc-800">
                 <Image 
-                  src={car.gambar} 
+                  src={getSafeImageSrc(car.gambar)} 
                   alt={`Gambar mobil ${car.nama}`} 
                   fill
                   className="object-cover"

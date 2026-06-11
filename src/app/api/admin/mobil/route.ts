@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { writeFile } from "fs/promises";
+import path from "path";
 
 export async function POST(req: Request) {
   try {
@@ -15,15 +17,15 @@ export async function POST(req: Request) {
 
     const formData = await req.formData();
 
-const nama = formData.get("nama")?.toString() || "";
-const slug = formData.get("slug")?.toString() || "";
+    const nama = formData.get("nama")?.toString() || "";
+    const slug = formData.get("slug")?.toString() || "";
 
-const hargaRaw = formData.get("harga")?.toString() || "";
-const hargaCleaned = hargaRaw.replace(/[^0-9]/g, ""); // Hanya menyisakan angka saja
-const harga = Number(hargaCleaned) || 0;
+    const hargaRaw = formData.get("harga")?.toString() || "";
+    const hargaCleaned = hargaRaw.replace(/[^0-9]/g, ""); // Hanya menyisakan angka saja
+    const harga = Number(hargaCleaned) || 0;
 
-const tipe = formData.get("tipe")?.toString() || "";
-const deskripsi = formData.get("deskripsi")?.toString() || "";
+    const tipe = formData.get("tipe")?.toString() || "";
+    const deskripsi = formData.get("deskripsi")?.toString() || "";
 
     const parseJSON = (value: string | null) => {
       try {
@@ -36,11 +38,11 @@ const deskripsi = formData.get("deskripsi")?.toString() || "";
     const warna = parseJSON(formData.get("warna") as string);
     const fitur = parseJSON(formData.get("fitur") as string);
 
-   const gambar = formData.get("gambar")?.toString() || "";
+   const fileGambar = formData.get("gambar") as File | null;
 
-    if (!nama || !slug || !harga || !tipe || !deskripsi || !gambar) {
+    if (!nama || !slug || !harga || !tipe || !deskripsi || !fileGambar) {
       return NextResponse.json(
-        { message: "Field wajib diisi" },
+        { message: "Field wajib diisi dan gambar harus diunggah" },
         { status: 400 }
       );
     }
@@ -58,6 +60,20 @@ const deskripsi = formData.get("deskripsi")?.toString() || "";
       );
     }
 
+    const buffer = Buffer.from(await fileGambar.arrayBuffer());
+
+    const fileExtension = path.extname(fileGambar.name) || ".jpg";
+    // const fileName = `mobil-${DataTransfer.now()}${fileExtension}`;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').replace('T', '_')
+    const fileName = `mobil-${timestamp}${fileExtension}`;
+
+// 
+    const publicStoragePath = path.join(process.cwd(), "public", "uploads", fileName);
+
+    await writeFile(publicStoragePath, buffer);
+
+    const dbImagePath = `/uploads/${fileName}`;
+
     const newCar = await prisma.kendaraan.create({
       data: {
         nama,
@@ -65,7 +81,7 @@ const deskripsi = formData.get("deskripsi")?.toString() || "";
         harga: Number(harga),
         tipe,
         deskripsi,
-        gambar,
+        gambar: dbImagePath,
         warna: JSON.stringify(warna),
         fitur: JSON.stringify(fitur),
       },

@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { writeFile, mkdir } from "fs/promises";
-import { Buffer } from "buffer";
 import path from "path";
 
 // ===================== PUT =====================
@@ -29,7 +27,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const tipe = formData.get("tipe")?.toString() || "";
     const deskripsi = formData.get("deskripsi")?.toString() || "";
 
-    const gambarFile = formData.get("gambar") as File | null;
+    const gambar = formData.get("gambar")?.toString().trim() || "";
 
     const parseJSON = (value: string | null) => {
       try {
@@ -43,7 +41,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const fiturParsed = parseJSON(formData.get("fitur") as string);
 
     // ✅ FIX 1: Memakai hargaRaw untuk pengecekan agar angka 0 tidak dianggap error kosong
-    if (!nama || !slug || !hargaRaw || !tipe || !deskripsi) {
+    if (!nama || !slug || !hargaRaw || !tipe || !deskripsi || !gambar) {
       return NextResponse.json(
         { message: "Field wajib diisi" },
         { status: 400 }
@@ -65,22 +63,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       );
     }
 
-    let gambarPath: string | undefined;
-
-    if (gambarFile && typeof gambarFile !== 'string' && typeof gambarFile.arrayBuffer === 'function') {
-      const bytes = await gambarFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
-      const filename = `${Date.now()}-${gambarFile.name}`;
-      const uploadDir = path.join(process.cwd(), "public/uploads");
-
-      await mkdir(uploadDir, { recursive: true });
-
-      await writeFile(path.join(uploadDir, filename), buffer);
-
-      gambarPath = `/uploads/${filename}`;
-    }
-
     const updatedCar = await prisma.kendaraan.update({
       where: { id: numericId }, 
       data: {
@@ -89,7 +71,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         harga: Number(harga),
         tipe,
         deskripsi,
-        ...(gambarPath && { gambar: gambarPath }),
+        gambar,
         warna: JSON.stringify(warnaParsed),
         fitur: JSON.stringify(fiturParsed),
       },

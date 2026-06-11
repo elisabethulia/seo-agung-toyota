@@ -300,6 +300,7 @@ export default function EditMobilForm({ initialCar }: EditMobilFormProps) {
                 id="gambar"
                 type="text"
                 name="gambar"
+                placeholder="https://..."
                 required
                 value={formData.gambar}
                 onChange={handleInputChange}

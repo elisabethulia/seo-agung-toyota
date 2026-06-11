@@ -276,7 +276,7 @@ export default function TambahMobilPage() {
               id="gambar"
               type="file"
               accept="image/*"
-              required
+              // required
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {

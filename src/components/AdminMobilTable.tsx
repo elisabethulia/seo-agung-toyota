@@ -31,6 +31,22 @@ const formatRupiah = (value: string | number) => {
   }).format(Number(cleanNumberString));
 };
 
+const getSafeImageSrc = (src: string | null | undefined) => {
+  const fallbackImage = "/uploads/mobil-default.jpg";
+
+  if (!src) return fallbackImage;
+
+  console.log(src);
+
+  if (src === "[object File]") return fallbackImage;
+
+  if (src.includes("via.placeholder.com")) return fallbackImage;
+
+  const isValidPath = src.startsWith("/") || src.startsWith("http://") || src.startsWith("https://");
+
+  return isValidPath ? src : fallbackImage;
+};
+
 export default function AdminMobilTable({ initialCars }: AdminMobilTableProps) {
   const [cars, setCars] = useState<Car[]>(initialCars);
   const [search, setSearch] = useState("");
@@ -137,7 +153,7 @@ export default function AdminMobilTable({ initialCars }: AdminMobilTableProps) {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="relative h-14 w-24 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
                         <Image
-                          src={car.gambar}
+                          src={getSafeImageSrc(car.gambar)}
                           alt={car.nama}
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
